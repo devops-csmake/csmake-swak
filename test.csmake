@@ -1,0 +1,72 @@
+# <copyright>
+# (c) Copyright 2017 Hewlett Packard Enterprise Development LP
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+# Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# </copyright>
+
+[~~phases~~]
+**default = test
+
+[command@]
+description=Test tiered locking
+0000=shell-command, prep-counter
+1000=add-one & add-one & add-one & add-one & add-one & add-one & add-one & add-one & add-one & add-one
+
+[command@many]
+description=Test flat locking
+0000=shell-command, prep-counter
+1000=add-many & add-many & add-many & add-many & add-many & add-many & add-many & add-many & add-many & add-many
+
+[Shell@prep-counter]
+command-clean=rm -f %(RESULTS)s/counter
+
+[&LockSection@add-one]
+tag=add-one
+phases=
+    test
+    build
+[subcommand@add-one]
+0000=add-again & add-again & add-again & add-again & add-again & add-again & add-again & add-again & add-again
+1000=add-again-in-thread
+
+[subcommand@add-many]
+0000=add-again & add-again & add-again & add-again & add-again & add-again & add-again & add-again & add-again & add-again
+
+[&LockSection@add-again]
+tag=add-again
+phases=
+    test
+    build
+[Shell@add-again]
+command(test,build,messup)=%(COMMAND)s
+
+[&LockSection@add-again-in-thread]
+tag=add-one
+phases=   test,   build
+[Shell@add-again-in-thread]
+command(test,build,messup) = %(COMMAND)s
+
+[environment@shell-command]
+COMMAND=if [ ! -e %(RESULTS)s/counter ]
+        then
+            echo 1 > %(RESULTS)s/counter
+        else
+            echo $(( 1 + `cat %(RESULTS)s/counter` )) > %(RESULTS)s/counter
+        fi
+
+
+[command@simple]
+description=Do a simple sanity check
+0000=shell-command, prep-counter, add-again
+1000=add-again & add-again & add-again & add-again
