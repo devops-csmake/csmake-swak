@@ -39,9 +39,9 @@ about=csmake library providing a useful suite of basic modules
  and environment tool modules, various control and file hacking tools as well.
  .
  Install gnupg to utilize the Signature submodule
-packager=HP CloudSystem RIDE Team  <hpcloud-cs-ride@hpe.com>
+packager=Jeremiah Patterson <jerpat@hpe.com>
 manufacturer=Hewlett Packard Enterprise
-depends=python (>= 2.7), wget, csmake (>= 1.5.19)
+depends=python (>= 2.6), wget, csmake (>= 1.5.19)
 recommends=gnupg
 keywords=make build development system swak shell environment versioning file hacking testing
 url=https://rndwiki.corp.hpecorp.net/confluence/display/cloudos/CsMake
@@ -59,13 +59,24 @@ classifiers=
     <CsmakeModules (python:csmake-modules)> CsmakeModules/*.py
 
 [copyright@csmake-copyright]
-disclaimer=This software was produced for and by Hewlett-Packard Enterprise
-   All rights are reserved.
-license=non-free
+disclaimer=
+ This program is free software: you can redistribute it and/or modify it
+ under the terms of the GNU General Public License as published by the
+ Free Software Foundation, either version 3 of the License, or (at your
+ option) any later version.
+ .
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+ Public License for more details.
+ .
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ .
+ On Debian based systems see: /usr/share/common-licenses
+license=GPLv3
 holder=Hewlett Packard Enterprise
 years=2014-2017
-comment=If csmake is made public, this copyright would need to change to
-   reflect that
 
 [AsciiGPGSignature@default-ascii-sign]
 [DebianPackage@debian-csmake]
@@ -74,7 +85,7 @@ default_python-script={root}/usr/bin/
 maps=csmake-installs
 result=%(RESULTS)s/debpackage
 debian-directory-copyright=csmake-copyright
-signer=default-ascii-sign
+#signer=default-ascii-sign
 
 [Signature@default-sign]
 [RpmPackage@rpm-csmake]
