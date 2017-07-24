@@ -106,6 +106,8 @@ class WgetPicker(CsmakeModule):
         buf = []
         links = []
 
+        self.log.info("Reading URL: %s", url)
+
         if not self.useProxy:
             proxies = urllib2.ProxyHandler({})
             opener = urllib2.build_opener(proxies)
