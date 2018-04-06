@@ -1,20 +1,5 @@
 # <copyright>
-# (c) Copyright 2017 Hewlett Packard Enterprise Development LP
-#
-# This program is free software: you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the
-# Free Software Foundation, either version 3 of the License, or (at your
-# option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
-# Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-# </copyright>
-# <copyright>
+# (c) Copyright 2018 Cardinal Peak Technologies
 # (c) Copyright 2017 Hewlett Packard Enterprise Development LP
 #
 # This program is free software: you can redistribute it and/or modify it
@@ -47,30 +32,53 @@ class WgetPicker(CsmakeModule):
                                   when True
                  Default: False
             use-text - (OPTIONAL) directs WgetPicker to use the anchor's
-                 text rather than the href when True
+                 text (what you actually see in a web browser)
+                 rather than the href (the actual link) when True
                  Default: False
+                 Notes: This is helpful when the links are odd, or
+                        don't parallel the actual names of the files.
+                        Bookmarks ('#') in links are *not* ignored.
             ignore-link-paths - (OPTIONAL) When True, the link (or text)
                  will ignore everything to the left of the last '/'
                  in the link text for the filters.
                  Default: False
-            format - (OPTIONAL) the format of the filenames to sort through
-                 use '{' and '}' to call out a tag, otherwise syntax is
-                 'glob' format.
-                 Default: every link given - this is usually going to be
-                          the wrong answer
-            order - (OPTIONAL) specify an ordering to consider the files
-                    for picking
-                 syntax: <direction>:<item>,<item>...
+                 Notes: This can be helpful when the actual links or text
+                        contain odd or complex paths.
+                        If you specify a format, paths must be taken into
+                        account.
+            format - (OPTIONAL)
+                 The format of the filenames match the format uses a glob style 
+                   (shell style wildcards)
+                 Also, tags can be used to specify a part of the filename to
+                   pick or sort using curly braces ('{' and '}').
+                 Tags can be called out in the 'order' and 'pick' options
+                   for further filtering
+                 If it's helpful:
+                   You can think of a tag as a named splat ('*')
+                 Default: Every link returned by the URL
+                 Notes: Tags (like '*') are greedy, for example {a}.{b}
+                    for a string 1.5.4.tar.gz will match up:
+                          a = 1.5.4.tar
+                          b = gz
+            order - (OPTIONAL) Specify an ordering for the format's tags
+                 usage: <direction>:<item>,<item>...
                    direction: either large->small or small->large
                      TODO: consider others like natural
                      TODO: consider multiple order specs
+                           (CURRENTLY only one spec is allowed)
                    item: a tag in the format
                          (if 'item' not given, the ordering will apply to
                           the entire string)
+                 example: 
+                   order=small->large:myitem
                  Default order is whatever is given by the server in
                    page order.
-            pick - (OPTIONAL) Will narrow the results based on the values
-                 syntax: <spec>:<info>
+            pick - (OPTIONAL)
+                 Specify which files to pick from the listing returned from URL
+                    as filtered by "format" and "order" options, if provided.
+                 Multiple picks will be applied in the order provided.
+                 Multiple picks are either semi-colon (';') or newline delimited
+                 usage: <spec>:<info>
                     either newline or semi-colon separated
                   spec:info types:
                     item:<item>=<value>
@@ -85,12 +93,37 @@ class WgetPicker(CsmakeModule):
                        will take the bottom <number> in the order of links
                        that match the format and previous pick filters.
             local - (OPTIONAL) Specify the directory to land the files locally
+                    Default: %(RESULTS)s directory
             no-proxy - (OPTIONAL) When True, the proxy settings in the
                        environment will be ignored.
                        Default: False
-
-    Phases:
+       Phases:
             pull, download  - pull specified file(s)
+       Example:
+            [WgetPicker@my-html-pull]
+            URL=https://pypi.python.org/simple/cartographer
+            use-text=True
+            format=cartographer-{version}.tar.gz
+            pick=first:3
+            order=large->small:version
+
+            This will get the 3 items matching the format string
+               with the highest versions (lexicographically).
+
+            [WgetPicker@my-lucky-pull]
+            URL=https://pypi.python.org/simple/cartographer
+            pick=last:1
+
+            This is a bit like google's "I'm feeling lucky" button :)
+            This will give you the last link listed on the page.
+
+            [WgetPicker@third-and-fourth-pick]
+            URL=https://pypi.python.org/simple/cartographer
+            pick=
+                first:4
+                last:2
+
+            This gets the third and fourth link from the URL
         """
 
     REQUIRED_OPTIONS = ['URL']
@@ -286,6 +319,15 @@ class WgetPicker(CsmakeModule):
                     self.log.devdebug("Links after pick '%s': %s", pick, str(formatFiltered))
 
             self.log.devdebug("Final links: %s", str(formatFiltered))
+            failOnEmpty = True
+            if 'no-error' in options:
+                failOnEmpty = options['no-error'] == 'False'
+            if len(formatFiltered) == 0 and failOnEmpty:
+                self.log.error("No files found")
+                self.log.failed()
+                return False
+            else:
+                self.log.warning("No files found. 'no-error' is not False")
 
             #Fetch each of the remaining pieces (TODO: in parallel)
             url = options['URL']

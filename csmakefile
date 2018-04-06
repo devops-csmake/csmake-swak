@@ -1,4 +1,5 @@
 # <copyright>
+# (c) Copyright 2018 Cardinal Peak Technologies
 # (c) Copyright 2017 Hewlett Packard Enterprise Development LP
 #
 # This program is free software: you can redistribute it and/or modify it
@@ -32,7 +33,7 @@ test=Run testing for csmake
 
 [metadata@csmake-swak]
 name=csmake-swak
-version=1.1.6
+version=1.1.7
 description=csmake swiss army knife library
 about=csmake library providing a useful suite of basic modules
  for testing modules, specialized shell outs, specialized versioning
@@ -45,7 +46,7 @@ depends=python (>= 2.6), wget, csmake (>= 1.5.19)
 recommends=gnupg
 keywords=make build development system swak shell environment versioning file hacking testing
 url=https://rndwiki.corp.hpecorp.net/confluence/display/cloudos/CsMake
-copyrights=csmake-copyright
+copyrights=csmake-copyright, cpt-copyright
 classifiers=
     Development Status :: 4 - Beta
     Intended Audience :: Developers
@@ -78,13 +79,18 @@ license=GPLv3
 holder=Hewlett Packard Enterprise
 years=2014-2017
 
+[copyright@cpt-copyright]
+license=GPLv3
+holder=Cardinal Peak Technologies
+years=2018
+
 [AsciiGPGSignature@default-ascii-sign]
 [DebianPackage@debian-csmake]
 package-version=1.0
 default_python-script={root}/usr/bin/
 maps=csmake-installs
 result=%(RESULTS)s/debpackage
-debian-directory-copyright=csmake-copyright
+debian-directory-copyright=cpt-copyright
 #signer=default-ascii-sign
 
 [Signature@default-sign]
@@ -121,7 +127,7 @@ group_root=root
 
 map_CsmakeModules=
    map: <CsmakeModules> -(1-1)-> {PYTHON}/CsmakeSwak/CsmakeModules/{~~file~~}}
-   copyright: csmake-copyright
+   copyright: csmake-copyright, cpt-copyright
    owner:{root}
    group:{root}
    permissions:644
