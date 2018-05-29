@@ -33,7 +33,7 @@ test=Run testing for csmake
 
 [metadata@csmake-swak]
 name=csmake-swak
-version=1.1.7
+version=1.1.9
 description=csmake swiss army knife library
 about=csmake library providing a useful suite of basic modules
  for testing modules, specialized shell outs, specialized versioning
