@@ -59,7 +59,7 @@ class ChrootShell(Shell):
     def _substituteSlashes(self, matchobj):
         return '\\' + matchobj.group(0)
 
-    SHELL_ESCAPES = re.compile('[`"$]')
+    SHELL_ESCAPES = re.compile(r'[\\`"$]')
     def _executeShell(self, command, env, execer='/bin/bash'):
         modcommand = None
         if self.chroot is None:
