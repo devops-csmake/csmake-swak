@@ -111,6 +111,7 @@ class Signature(CsmakeModuleAllPhase):
             self.ready.set()
             self.finish.wait()
             self.input.close()
+            self.process.wait()
             buf = self.process.stdout.read()
             self.output = []
             while len(buf) > 0:
@@ -119,7 +120,6 @@ class Signature(CsmakeModuleAllPhase):
                     buf = self.process.stdout.read()
                 except:
                     break
-            self.process.wait()
             self.parent._unregisterOnExitCallback("_stopSigner")
             result = self.process.returncode
             self.failed = result != 0
