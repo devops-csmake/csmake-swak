@@ -19,6 +19,8 @@ from Csmake.CsmakeModuleAllPhase import CsmakeModuleAllPhase
 import threading
 import subprocess
 import binascii
+import time
+import os
 
 class Signature(CsmakeModuleAllPhase):
     """Purpose: Returns an object that behaves like a hashlib hash function.
@@ -75,11 +77,12 @@ class Signature(CsmakeModuleAllPhase):
             if self.finish.is_set():
                 raise RuntimeError("update may not be called after digest or close")
             self.ready.wait()
-            self.input.write(buf)
+            os.write(self.input.fileno(), buf)
 
         def _finish(self):
             if self.finish.is_set():
                 self.join()
+                return
             self.finish.set()
             self.join()
 
@@ -106,19 +109,22 @@ class Signature(CsmakeModuleAllPhase):
             self.process = subprocess.Popen(
                 self.command,
                 stdout=subprocess.PIPE,
-                stdin=subprocess.PIPE )
+                stdin=subprocess.PIPE,
+                bufsize=1 )
             self.input = self.process.stdin
             self.ready.set()
             self.finish.wait()
             self.input.close()
             self.process.wait()
-            buf = self.process.stdout.read()
+            buf = os.read(self.process.stdout.fileno(), 1024)
             self.output = []
             while len(buf) > 0:
                 self.output.append(buf)
                 try:
-                    buf = self.process.stdout.read()
+                    buf = os.read(self.process.stdout.fileno(), 1024)
                 except:
+                    self.log.exception("Signing failed")
+                    self.failed = True
                     break
             self.parent._unregisterOnExitCallback("_stopSigner")
             result = self.process.returncode
