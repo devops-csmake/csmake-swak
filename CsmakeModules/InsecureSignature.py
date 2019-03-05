@@ -57,7 +57,7 @@ class InsecureSignature(Signature):
 
     class InsecureSigner(Signature.Signer):
         def _setPassword(self, password):
-            self.command.extend(['--passphrase', password])
+            self.command.extend(['--passphrase', password, '--batch'])
 
         def run(self):
             if 'password' in self.options:
