@@ -1,5 +1,5 @@
 # <copyright>
-# (c) Copyright 2018 Cardinal Peak Technologies
+# (c) Copyright 2018,2020 Cardinal Peak Technologies
 #
 # This program is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the
@@ -58,6 +58,18 @@ class InsecureSignature(Signature):
     class InsecureSigner(Signature.Signer):
         def _setPassword(self, password):
             self.command.extend(['--passphrase', password, '--batch'])
+            try:
+                version = subprocess.check_output(
+                    "gpg --version | head -n 1 | cut -d\' \' -f 3",
+                    shell=True ).strip()
+                major, minor, patch = version.split('.')
+                major = int(major)
+                minor = int(minor)
+                patch = int(patch)
+                if major >= 2 and minor >= 1:
+                    self.command.extend(['--pinentry-mode', 'loopback'])
+            except:
+                self.log.warning("GPG version test failed: %s", str(ex))
 
         def run(self):
             if 'password' in self.options:
