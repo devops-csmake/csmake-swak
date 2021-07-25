@@ -1,4 +1,5 @@
 # <copyright>
+# (c) Copyright 2021 Cardinal Peak Technologies
 # (c) Copyright 2017 Hewlett Packard Enterprise Development LP
 #
 # This program is free software: you can redistribute it and/or modify it
@@ -15,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # </copyright>
 from Csmake.CsmakeAspect import CsmakeAspect
-import os.path
+import glob
 
 class SkipIfFileExists(CsmakeAspect):
     """Purpose: Only allow the cross-cut section to run if given file does
@@ -29,7 +30,8 @@ class SkipIfFileExists(CsmakeAspect):
     REQUIRED_OPTIONS = ['file']
 
     def start(self, phase, options, step, stepoptions):
-        if os.path.exists(options['file']):
+        paths = glob.glob(options['file'])
+        if len(paths) != 0:
             self.log.info("Skipping section - file '%s' found", options['file'])
             self.flowcontrol.override("doNotStart", True, self)
         self.log.passed()

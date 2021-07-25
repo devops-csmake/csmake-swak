@@ -1,5 +1,5 @@
 # <copyright>
-# (c) Copyright 2018,2020 Cardinal Peak Technologies
+# (c) Copyright 2018,2020-2021 Cardinal Peak Technologies
 # (c) Copyright 2017 Hewlett Packard Enterprise Development LP
 #
 # This program is free software: you can redistribute it and/or modify it
@@ -33,7 +33,7 @@ test=Run testing for csmake
 
 [metadata@csmake-swak]
 name=csmake-swak
-version=1.1.13
+version=1.1.15
 description=csmake swiss army knife library
 about=csmake library providing a useful suite of basic modules
  for testing modules, specialized shell outs, specialized versioning
@@ -82,7 +82,7 @@ years=2014-2017
 [copyright@cpt-copyright]
 license=GPLv3
 holder=Cardinal Peak Technologies
-years=2018
+years=2018, 2020-2021
 
 [AsciiGPGSignature@default-ascii-sign]
 [DebianPackage@debian-csmake]
