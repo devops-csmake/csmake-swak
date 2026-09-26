@@ -118,12 +118,12 @@ class LockSection(CsmakeAspect):
         if not os.path.exists(path):
             os.makedirs(path)
         try:
-            os.chmod(path, 0777)
+            os.chmod(path, 0o777)
         except:
             self.log.exception("Attempting lock chmod on lock dir")
         self.flock = open(self.flockPath, 'a')
         try:
-            os.chmod(self.flockPath, 0666)
+            os.chmod(self.flockPath, 0o666)
         except:
             self.log.exception("Attempting lock chmod on lock")
         self.log.info("___ attempting lock   Tag: %s  In: %s", tag, path)

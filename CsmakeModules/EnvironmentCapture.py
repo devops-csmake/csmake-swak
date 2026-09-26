@@ -56,7 +56,7 @@ class EnvironmentCapture(CsmakeModuleAllPhase):
     def default(self, options):
         self.format = options['format']
         formatdict = {}
-        for key, value in options.iteritems():
+        for key, value in options.items():
             keyparts = key.split('_')
             if len(keyparts) != 2:
                 continue
@@ -68,7 +68,8 @@ class EnvironmentCapture(CsmakeModuleAllPhase):
                     value,
                     shell=True,
                     stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE )
+                    stderr=subprocess.PIPE,
+                    universal_newlines=True )
                 stdout, stderr = p.communicate()
                 if p.returncode != 0:
                     self.log.warning("%s produced a non-zero returncode (%d)",

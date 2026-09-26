@@ -88,11 +88,11 @@ class Signature(CsmakeModuleAllPhase):
 
         def hexdigest(self):
             self._finish()
-            return binascii.hexlify(''.join(self.output))
+            return binascii.hexlify(b''.join(self.output)).decode('ascii')
 
         def digest(self):
             self._finish()
-            return ''.join(self.output)
+            return b''.join(self.output)
 
         def close(self):
             self._finish()

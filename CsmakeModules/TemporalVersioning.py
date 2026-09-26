@@ -73,7 +73,7 @@ class TemporalVersioning(versioning):
             temporal = {}
             if os.path.exists(pathToTemporalFile):
                 try:
-                    with open(pathToTemporalFile) as temporalFile:
+                    with open(pathToTemporalFile, 'rb') as temporalFile:
                         temporal = pickle.load(temporalFile)
                 except:
                     self.log.exception("Failed to open/read temporal file")
@@ -91,7 +91,7 @@ class TemporalVersioning(versioning):
 
             #Rewrite the pickle
             try:
-                with open(pathToTemporalFile, 'w') as temporalFile:
+                with open(pathToTemporalFile, 'wb') as temporalFile:
                     pickle.dump(temporal, temporalFile)
             except:
                 self.log.exception("Failed to store the updated temporal versioning")
