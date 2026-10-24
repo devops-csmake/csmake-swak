@@ -31,6 +31,16 @@ test=Run testing for csmake
    clean -> package: create the csmake install package
 **default=clean -> package
 
+[TestPython@test-swak]
+test-dir=tests/
+test=test*.py
+source-dir=.
+resource-dir=%(WORKING)s/tests
+
+[command@test]
+description=Run testing
+000=test-swak
+
 [metadata@csmake-swak]
 name=csmake-swak
 version=1.1.15

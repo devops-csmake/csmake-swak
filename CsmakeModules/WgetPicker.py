@@ -284,7 +284,10 @@ class WgetPicker(CsmakeModule):
                         indexedList.append(indexitems)
                 else:
                     for index, link in enumerate(formatFiltered):
-                        indexedList.append([link,index])
+                        #Order on the entire string, as documented.
+                        #(Sorting the whole link list would compare the
+                        # groups dicts, which Python 3 cannot do.)
+                        indexedList.append([link[-1],index])
                 indexedList.sort()
                 if orderParts[0].strip() == 'large->small':
                     indexedList.reverse()
