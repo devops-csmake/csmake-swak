@@ -61,7 +61,8 @@ class InsecureSignature(Signature):
             try:
                 version = subprocess.check_output(
                     "gpg --version | head -n 1 | cut -d\' \' -f 3",
-                    shell=True ).strip()
+                    shell=True,
+                    universal_newlines=True ).strip()
                 major, minor, patch = version.split('.')
                 major = int(major)
                 minor = int(minor)

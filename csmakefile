@@ -31,6 +31,16 @@ test=Run testing for csmake
    clean -> package: create the csmake install package
 **default=clean -> package
 
+[TestPython@test-swak]
+test-dir=tests/
+test=test*.py
+source-dir=.
+resource-dir=%(WORKING)s/tests
+
+[command@test]
+description=Run testing
+000=test-swak
+
 [metadata@csmake-swak]
 name=csmake-swak
 version=1.1.15
@@ -42,7 +52,7 @@ about=csmake library providing a useful suite of basic modules
  Install gnupg to utilize the Signature submodule
 packager=Jeremiah Patterson <jerpat@hpe.com>
 manufacturer=Hewlett Packard Enterprise
-depends=python (>= 2.6), wget, csmake (>= 1.5.19)
+depends=python (>= 3.6), wget, csmake (>= 1.5.19)
 recommends=gnupg
 keywords=make build development system swak shell environment versioning file hacking testing
 url=https://rndwiki.corp.hpecorp.net/confluence/display/cloudos/CsMake
@@ -52,9 +62,8 @@ classifiers=
     Intended Audience :: Developers
     Topic :: Software Development :: Build Tools
     Topic :: System :: Installation/Setup
-    Programming Language :: Python :: 2
-    Programming Language :: Python :: 2.6
-    Programming Language :: Python :: 2.7
+    Programming Language :: Python :: 3
+    Programming Language :: Python :: 3 :: Only
     License :: Other/Proprietary License
 **files=
     <CsmakeModules (python:csmake-modules)> CsmakeModules/*.py

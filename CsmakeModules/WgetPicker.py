@@ -15,9 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # </copyright>
-from Csmake.CsmakeModule import CsmakeModule
-import urlparse
-import urllib2
+from CsmakeCore.CsmakeModule import CsmakeModule
+import urllib.parse
+import urllib.request
 import re
 import fnmatch
 import os.path
@@ -142,12 +142,12 @@ class WgetPicker(CsmakeModule):
         self.log.info("Reading URL: %s", url)
 
         if not self.useProxy:
-            proxies = urllib2.ProxyHandler({})
-            opener = urllib2.build_opener(proxies)
-            req = urllib2.Request(url)
+            proxies = urllib.request.ProxyHandler({})
+            opener = urllib.request.build_opener(proxies)
+            req = urllib.request.Request(url)
             fd = opener.open(req)
         else:
-            fd = urllib2.urlopen(url)
+            fd = urllib.request.urlopen(url)
 
         r = fd.read()
         while len(r) != 0:
@@ -160,7 +160,7 @@ class WgetPicker(CsmakeModule):
         self.url = url
         self.exc_info = None
 
-        buf = ''.join(buf).split('<a ')[1:]
+        buf = b''.join(buf).decode('utf-8', errors='replace').split('<a ')[1:]
         buf = [ x.split('</a')[0].split('>',1) for x in buf ]
         self.log.devdebug("Link parts: %s", str(buf))
         for link in buf:
@@ -176,7 +176,7 @@ class WgetPicker(CsmakeModule):
                 continue
             linkmatch = match.group('link')
             if linkmatch is not None:
-                linkmatch = urllib2.unquote(linkmatch)
+                linkmatch = urllib.parse.unquote(linkmatch)
             links.append([linkmatch, link[1].split("#")[0]])
         return links
 
@@ -242,8 +242,8 @@ class WgetPicker(CsmakeModule):
             #Apply format re to get all matches
             formatFiltered = []
             if 'format' in options:
-                formatGlob = CsmakeModule.BRACKET_RE.sub("*\g<follow>", options['format']).replace('}}','}')
-                formatRE = re.compile(CsmakeModule.BRACKET_RE.sub('(?P<\g<sub>>.*)\g<follow>',fnmatch.translate(options['format']).replace('\\}','}').replace('\\{','{')).replace('}}','\\}'))
+                formatGlob = CsmakeModule.BRACKET_RE.sub(r"*\g<follow>", options['format']).replace('}}','}')
+                formatRE = re.compile(CsmakeModule.BRACKET_RE.sub(r'(?P<\g<sub>>.*)\g<follow>',fnmatch.translate(options['format']).replace('\\}','}').replace('\\{','{')).replace('}}','\\}'))
                 for link in links:
                     if fnmatch.fnmatch(link[-1], formatGlob):
                         formatFiltered.append(link)
@@ -284,7 +284,10 @@ class WgetPicker(CsmakeModule):
                         indexedList.append(indexitems)
                 else:
                     for index, link in enumerate(formatFiltered):
-                        indexedList.append([link,index])
+                        #Order on the entire string, as documented.
+                        #(Sorting the whole link list would compare the
+                        # groups dicts, which Python 3 cannot do.)
+                        indexedList.append([link[-1],index])
                 indexedList.sort()
                 if orderParts[0].strip() == 'large->small':
                     indexedList.reverse()
@@ -345,7 +348,7 @@ class WgetPicker(CsmakeModule):
                 urlfile = link[1]
                 _, filename = os.path.split(link[1])
                 _, landingName = os.path.split(link[-1])
-                fullurl = urlparse.urljoin(url, urlfile)
+                fullurl = urllib.parse.urljoin(url, urlfile)
                 self.log.devdebug("Pulling URL: %s", fullurl)
                 command = ['wget']
                 if self.settings['debug']:
@@ -362,7 +365,7 @@ class WgetPicker(CsmakeModule):
                     command,
                     stdout=self.log.out(),
                     stderr=self.log.err() )
-                #getlink = urllib2.urlopen(fullurl)
+                #getlink = urllib.request.urlopen(fullurl)
                 #with open(os.path.join(basepath, filename),'w') as localfile:
                 #    r = getlink.read(self.READ_BUFFER_SIZE)
                 #    while len(r) != 0:

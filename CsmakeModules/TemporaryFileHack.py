@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # </copyright>
-from Csmake.CsmakeAspect import CsmakeAspect
+from CsmakeCore.CsmakeAspect import CsmakeAspect
 import shutil
 import os.path
 import os
@@ -85,7 +85,7 @@ class TemporaryFileHack(CsmakeAspect):
         self.log.devdebug("  starting with: %s", options['replace'])
         replaceText = self._filterLinePad(options, options['replace'])
         self.log.devdebug("  after stripping: %s", replaceText)
-        with file(self.targetFile, 'w') as openTarget:
+        with open(self.targetFile, 'w') as openTarget:
             openTarget.write(replaceText)
         self.log.passed()
         return True
@@ -104,7 +104,8 @@ class TemporaryFileHack(CsmakeAspect):
             ['patch', self.targetFile],
             stdout=self.log.out(),
             stderr=self.log.err(),
-            stdin=subprocess.PIPE )
+            stdin=subprocess.PIPE,
+            universal_newlines=True )
         process.stdin.write(patchText)
         process.stdin.close()
         result = process.wait()
@@ -134,15 +135,15 @@ class TemporaryFileHack(CsmakeAspect):
 
     def _append(self, options):
         appendText = self._filterLinePad(options, options['append'])
-        with file(self.targetFile, 'a') as openTarget:
+        with open(self.targetFile, 'a') as openTarget:
             openTarget.write(appendText)
         self.log.passed()
         return True
 
     def _appendFile(self, options):
         sourceFile = options['append-file']
-        with file(self.targetFile, 'a') as openTarget:
-            with file(sourceFile) as source:
+        with open(self.targetFile, 'a') as openTarget:
+            with open(sourceFile) as source:
                 openTarget.writelines(source.readlines())
         self.log.passed()
         return True
@@ -160,7 +161,7 @@ class TemporaryFileHack(CsmakeAspect):
         return True
 
     def _setPermissiveMode(self, path):
-        oldMode = oct(os.stat(self.dirpath).st_mode & 0777)[1:]
+        oldMode = '%o' % (os.stat(self.dirpath).st_mode & 0o777)
         if not self._setFileMode(path, '777'):
             self.log.error("Could not set permissive move on '%s'",
                 path )
@@ -248,7 +249,8 @@ class TemporaryFileHack(CsmakeAspect):
             except:
                 try:
                     self.linkPath = subprocess.check_output(
-                        ['sudo', 'readlink', self.targetFile] ).strip()
+                        ['sudo', 'readlink', self.targetFile],
+                        universal_newlines=True ).strip()
                 except Exception as e:
                     self.log.info("Link for '%s' could not be resolved", self.targetFile)
                     self.log.debug("    Exception: %s: %s", e.__class__.__name__, str(e))
@@ -298,7 +300,7 @@ class TemporaryFileHack(CsmakeAspect):
         #Save the mode string for the dir to restore it on exit
 
         if os.path.exists(self.targetFile):
-            self.realFileMode = oct(os.stat(self.targetFile).st_mode & 0777)[1:]
+            self.realFileMode = '%o' % (os.stat(self.targetFile).st_mode & 0o777)
             self._ensureDirectoryExists(self.tempFile)
             result = subprocess.call(
                 ['sudo', 'chmod', '777', self.targetFile],
@@ -309,7 +311,7 @@ class TemporaryFileHack(CsmakeAspect):
             shutil.copy2(self.targetFile, self.tempFile)
         else:
             #Go ahead and touch the file
-            with file(self.targetFile, 'w') as openTarget:
+            with open(self.targetFile, 'w') as openTarget:
                 openTarget.write('')
         if 'replace' in options:
             return self._replace(options)
